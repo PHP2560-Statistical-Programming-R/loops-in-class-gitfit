@@ -89,6 +89,24 @@ bubble_sort = function(vec) { # create function with an argument vec
     vec
 }
 ```
+```{r}
+bubblesort <- function(x) {
+# x is initially the input vector and will be
+# modified to form the output
+if (length(x) < 2) return (x)
+# last is the last element to compare with
+for(last in length(x):2) {
+  for(first in 1:(last - 1)) {
+    if(x[first] > x[first + 1]) { # swap the pair
+      save <- x[first]
+      x[first] <- x[first + 1]
+      x[first + 1] <- save
+    }
+  }
+}
+return (x)
+}
+```
 
 ### Problem 3: Applying the Sort with dice rolls
 
@@ -99,7 +117,7 @@ x <- matrix(nrow=10, ncol=5)
 for (i in 1:10)
   {
   x[i,] <- sample(1:6, size=5, replace=T)
-  x[i,] <- bubble_sort(x[i,])
+  x[i,] <- bubblesort(x[i,])
 }
 x
 ```
@@ -137,11 +155,12 @@ As you can see, these would all fulfill the first and third conditions proposed 
 ```{r}
 x <- bubble_sort(sample(1:6, size=5, replace=T))
 
-if (x[1] == x[5]){
+hand_type <- function(x){
+  if (x[1] == x[5]){
   hand = "Yahtzee"
 } else if (x[1] == x[4] | x[2] == x[5]) {
     hand = "4ofKind"
-} else if (identical(x, c(1:5))) {
+} else if (x[2] == x[1] + 1 & x[3] == x[2] + 1 & x[4] == x[3] + 1 & x[5] == x[4] + 1) {
   hand = "LargeStraight"
 } else if (x[1] == x[3]) {
   if(x[4] == x[5]){
@@ -157,11 +176,14 @@ if (x[1] == x[5]){
   } else {
     hand = "3ofKind"
   }
-} else if (identical(x[1:4],c(1:4)) | identical(x[1:4],c(2:5)) | identical(x[2:5],c(1:4)) | identical(x[2:5], c(2:5))){
+} else if (x[3] == x[2] + 1 & x[4] == x[3] + 1 & (x[2] == x[1] + 1 | x[5] == x[4] + 1) | 
+           (x[2] == x[1] + 1 & x[3] == x[2] & x[4] == x[3] + 1 & x[5] == x[4] + 1) |
+           x[2] == x[1] + 1 & x[3] == x[2] + 1 & x[4] == x[3] & x[5] == x[4] + 1){
   hand = "SmallStraight"
 } else {
  hand = "Chance"
  }
+}
 ```
 
 The above code lays this out for Yahtzee and 4 of a kind. Find statements that work for the rest. Make sets of x and test them to make sure they work.
@@ -190,7 +212,18 @@ Small Straight    .1235
 Chance            .6326
 -------------------------------------------------------
 
+```{r}
+x <- matrix(nrow=100000, ncol=5)
+hand <- character(100000)
+for (i in 1:100000)
+  {
+  x[i,] <- sample(1:6, size=5, replace=T)
+  x[i,] <- bubblesort(x[i,])
+  hand[i] <- hand_type(x[i,])
+}
 
+table(hand)/100000
+```
 
 ## Part II: PHP 2560 Only
 
@@ -199,7 +232,7 @@ Chance            .6326
 
 Standardizing a variable means subtracting the mean, and then dividing by the standard deviation. Let’s use a loop to standardize the numeric columns in the [Western Collaborative Group Study](https://clinicaltrials.gov/ct2/show/NCT00005174). This study began in 1960 with 3154 men ages 39-59, who were employed in one of 11 California based companies. They were followed until 1969 during this time, 257 of these men developed coronary heart disease (CHD). You can read this data in with the code below. You can access this dataset with the following code:
 
-```
+```{r}
 
 suppressMessages(library(foreign))
 wcgs <- read.dta("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
@@ -281,6 +314,26 @@ B. Assign all the numeric columns of the original WCGS dataset to a new dataset 
 C. Using a loop and your new function, standardize all the variables WCGS.new dataset.
 D. What should the mean and standard deviation of all your new standardized variables be? Test your prediction by running a loop
 
+```{r}
+standardize.me <- function(x){
+  m <- mean(x, na.rm = TRUE)
+  sd <- sd(x, na.rm = TRUE)
+  return((x - m) / sd)
+}
+
+library(dplyr)
+WCGS.new <- select(wcgs, id, age, height, weight, sbp, dbp, chol, ncigs, time169, bmi)
+
+for(i in 1:length(names(WCGS.new))){
+  WCGS.new[,i] <- standardize.me(WCGS.new[,i])
+}
+
+for(i in 1:length(names(WCGS.new))){
+  print(names(WCGS.new)[i])
+  print(mean(WCGS.new[,i], na.rm = TRUE))
+  print(sd(WCGS.new[,i], na.rm=TRUE))
+}
+```
 
 
 
@@ -289,3 +342,28 @@ D. What should the mean and standard deviation of all your new standardized vari
 A. Using a loop, calculate the mean weight of the subjects separated by the type of CHD they have.
 B. Now do the same thing, but now don’t use a loop
 
+```{r}
+noCHD <- numeric(0)
+MIorSD <- numeric(0)
+silentMI <- numeric(0)
+angina <- numeric(0)
+for(i in 1:nrow(wcgs)){
+  if(wcgs$typchd69[i] == "no CHD"){
+    noCHD <- append(noCHD, wcgs$weight[i])
+  } else if(wcgs$typchd69[i] == "MI or SD"){
+    MIorSD <- append(MIorSD, wcgs$weight[i])
+  } else if(wcgs$typchd69[i] == "silent MI"){
+    silentMI <- append(silentMI, wcgs$weight[i])
+  } else if(wcgs$typchd69[i] == "angina"){
+    angina <- append(angina, wcgs$weight[i])
+  } 
+}
+mean(noCHD, na.rm=TRUE)
+mean(MIorSD, na.rm=TRUE)
+mean(silentMI, na.rm = TRUE)
+mean(angina, na.rm = TRUE)
+
+wcgs %>%
+  group_by(typchd69) %>%
+  summarize(mean = mean(weight))
+```
