@@ -7,7 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
 ```
 
 
@@ -72,14 +71,46 @@ x
 We will need to sort this. The following function is called a *Bubble Sort*. Comment on every part of the code to explain what it is doing:
 
 ```{r}
+# create a function of the name bubble_sort by having vec as a variable
+bubble_sort = function(vec) {
+    no_passes = 0
+  #set no passes=0
+    while(1) {
+    #while loop is used to continue running the function if no swaps is greater than 0
+        no_swaps = 0
+        #initialize the vector and set no_swaps=0
+        for (j in 1 : (length(vec) - 1 - no_passes)) {
+          #initialize the for loop where it loops from the start through the entire length of the vector
+            if (vec[j] > vec[j + 1]) {
+              #if the vector satisifies this statement where j>j+1 then it will output the function listed below
+                s = vec[j]
+                #s equals the number within the j position
+                vec[j] = vec[j+1]
+                #updating the value in the j position to j+1
+                vec[j+1] = s
+                #the new value of s is equal to j+1
+                no_swaps = no_swaps + 1
+                #updates no_swaps by adding 1 to it
+            }
+        }
+        no_passes = no_passes + 1
+        #updates no_passes by adding 1 to it
+        if(no_swaps == 0) break
+        #if no_swaps=0 then it will "break" or stop looping and print out vec
+    }
+    vec
+}
+```
+
+### Problem 3: Applying the Sort with dice rolls
+
+Apply Bubble sort to each row of your matrix to sort the data. (You may wish to do this within your loop so the rows are sorted as they get added.) 
+```{r}
 bubblesort <- function(x) {
-# x is initially the input vector and will be
-# modified to form the output
 if (length(x) < 2) return (x)
-# last is the last element to compare with
 for(last in length(x):2) {
 for(first in 1:(last - 1)) {
-if(x[first] > x[first + 1]) { # swap the pair
+if(x[first] > x[first + 1]) { 
 save <- x[first]
 x[first] <- x[first + 1]
 x[first + 1] <- save
@@ -88,39 +119,15 @@ x[first + 1] <- save
 }
 return (x)
 }
+bubblesort(x)
 
-#bubble_sort = function(vec) { # Creating a function called bubble sort that takes the variable vec as an input
- #   no_passes = 0 # defining initial values. The number of passes
-  #  while(1) { # this tells R to run the function if the condiiton  no_swaps >0 is met
-   #     no_swaps = 0 #initialize the vector no_swaps which counts the number of swaps
-    #    for (j in 1 : (length(vec) - 1 - no_passes)) { # the loop runs the length of(vec) -1 -nopasses
-     #       if (vec[j] > vec[j + 1]) { # This sets up the inner if statement. SO if vec[j]>vec[j+1] then
-      #          s = vec[j] # s is equal to the number in the jth position of vec
-       #         vec[j] = vec[j+1] # and vec now equals the number in the jth+1 position
-        #        vec[j+1] = s # this renames the variable s, which is a temporary holding variable 
-         #       no_swaps = no_swaps + 1 # this updates the vector no_swaps by incrementing by 1 so the loop can keep running
-          #  }
-        #}
-        #no_passes = no_passes + 1 # the vector no_passes is incremented by 1 so the loop can continue
-        #if(no_swaps == 0) break # Break from the for loop if the variable no_swaps is equal to 0
-   # }
-    #vec # print the final result "vec"
-#}
-```
-
-### Problem 3: Applying the Sort with dice rolls
-
-Apply Bubble sort to each row of your matrix to sort the data. (You may wish to do this within your loop so the rows are sorted as they get added.) 
-
-```{r}
-x_update<-x
-for (i in 1:nrow(x)){
-  x_update[i,]<-bubblesort(x[i,])
+y<-x
+for(i in 1:nrow(x)){
+  y[i,]<-bubblesort(x[i,])
 }
-
-x_update
-
+y
 ```
+
 
 
 
@@ -155,31 +162,35 @@ These would all be correctly identified.  But what about:
 As you can see, these would all fulfill the first and third conditions proposed above, but they should be classified as Full House.  Therefore  we also need to check for a Full House in these cases.  The following identification routine checks for these types of Hands. At each stage, we have to be very careful that all possibilities are accounted for.
 
 ```{r}
-x <- bubble_sort(sample(1:6, size=5, replace=T))
+result<- function(y){
+x <- bubblesort(sample(1:6, size=5, replace=T))
 
-if (x[1]=x[5]){
+if (TRUE && x[1] == x[5]){
   hand="Yahtzee"
-} else if (x[1]=x[4] | x[2]=x[5]) {
+} else if (x[1] == x[4] | x[2] == x[5]) {
     hand="4ofKind"
-  
-}else if (x[4]=x[5]& x[1]=x[3] | x[3]=x[5]& x[1]=x[2] ){
+} else if ((x[1] == x[3] & x[4] == x[5]) | (x[2] == x[4] & x[1]==x[5]) | (x[3]==x[5] & x[1]==x[2])){
   hand="FullHouse"
+} else if ((x[1]==x[3] & x[4] != x[5])|(x[2] ==x[4] & x[1]!=x[5])| (x[3]==x[5] & x[1]!=x[2])){
+hand="ThreeofKind"
+} else if (((x[4]== (x[3]+1) & x[3] == (x[2]+1) & x[2]==(x[1]+1) & x[5]!=(x[1]+4))| x[5]==(x[4]+1) & x[4]== (x[3]+1) & x[3]== (x[2]+1) & x[5]!= (x[1]+4) )| (x[1]==x[2] & x[3]==(x[2]+1) & x[4]==(x[3]+1) & x[5]== (x[4]+1)) | (x[2]=x[3] & x[4]==(x[3]+1) & x[5]==(x[4]+1)& x[2]==(x[1]+1)) | (x[3]==x[4] & x[3]==(x[2]+1) & x[2]==(x[1]+1) & x[5]==(x[4]+1)) | x[5]==x[4] & x[4]==(x[3]+1) & x[3]==(x[2]+1) & x[2]==(x[1]+1)){
+   hand="SmallStraight"
+} else if(x[5]==(x[1]+4) & x[5]==(x[4]+1) & x[4]==(x[3]+1) & x[3]==(x[2]+1)& x[2]==(x[1]+1)){
+   hand="LargeStraight"
+ }else {
+   hand="Chance"
+ }
+return(hand)
 }
-else if (x[1]=x[3]| x[2]=x[4]|x[3]=x[5]){
-  hand="3ofKind"
-} else if (x[1]=x[2]=x[3]=x[4]|x[2]=x[3]=x[4]=x[5]){
-  hand="Small"
-}
-
-Small Straight (four consecutive numbers)
-- Large Straight (five consecutive numbers)
-...
-
- 
- hand="Chance"
 ```
 
+
+
 The above code lays this out for Yahtzee and 4 of a kind. Find statements that work for the rest. Make sets of x and test them to make sure they work.
+
+
+
+
 
 
 
@@ -204,6 +215,13 @@ Small Straight    .1235
 
 Chance            .6326
 -------------------------------------------------------
+```{r}
+table_1<-matrix('',nrow=100000)
+for(i in 1:nrow(table_1)){
+ table_1[i]=result(sample(1:6, size=5, replace=T))
+}
+table(table_1)/nrow(table_1)
+```
 
 
 
@@ -214,7 +232,7 @@ Chance            .6326
 
 Standardizing a variable means subtracting the mean, and then dividing by the standard deviation. Let’s use a loop to standardize the numeric columns in the [Western Collaborative Group Study](https://clinicaltrials.gov/ct2/show/NCT00005174). This study began in 1960 with 3154 men ages 39-59, who were employed in one of 11 California based companies. They were followed until 1969 during this time, 257 of these men developed coronary heart disease (CHD). You can read this data in with the code below. You can access this dataset with the following code:
 
-```{r}
+```
 
 suppressMessages(library(foreign))
 wcgs <- read.dta("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
@@ -292,36 +310,8 @@ bmi     Body Mass Index
 ### Question 6: Standardize Function
 
 A. Create a function called standardize.me() that takes a numeric vector as an argument, and returns the standardized version of the vector. 
-```{r}
-x=WCGS.new
-
-standardize.me<-function(x)
-  {answer<-matrix(ncol=ncol(x),nrow=nrow(x))
-
-  for (i in 1:ncol(x)){
- answer[,i]<-(x[,i]- colMeans(x[i],na.rm=TRUE))/sd(x[,i],na.rm=TRUE)
-  }
-return(answer)
-}
-
-```
-
 B. Assign all the numeric columns of the original WCGS dataset to a new dataset called WCGS.new.
-```{r}
-WCGS.new<-
-  wcgs%>%
-  select(age,height,weight,sbp,dbp,chol,ncigs,bmi)
-```
-
 C. Using a loop and your new function, standardize all the variables WCGS.new dataset.
-```{r}
-
-
-  standardize.me(WCGS.new)
-
-
-```
-
 D. What should the mean and standard deviation of all your new standardized variables be? Test your prediction by running a loop
 
 

@@ -1,13 +1,12 @@
 ---
 title: "Loops and basic functions"
-author: ""
+author: "Isaac Zhao"
 date: "September 27, 2017"
 output: html_document
 ---
-
+hello
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
 ```
 
 
@@ -70,7 +69,6 @@ x
 [10,]    6    6    1    4    6
 ```
 We will need to sort this. The following function is called a *Bubble Sort*. Comment on every part of the code to explain what it is doing:
-
 ```{r}
 bubblesort <- function(x) {
 # x is initially the input vector and will be
@@ -88,24 +86,6 @@ x[first + 1] <- save
 }
 return (x)
 }
-
-#bubble_sort = function(vec) { # Creating a function called bubble sort that takes the variable vec as an input
- #   no_passes = 0 # defining initial values. The number of passes
-  #  while(1) { # this tells R to run the function if the condiiton  no_swaps >0 is met
-   #     no_swaps = 0 #initialize the vector no_swaps which counts the number of swaps
-    #    for (j in 1 : (length(vec) - 1 - no_passes)) { # the loop runs the length of(vec) -1 -nopasses
-     #       if (vec[j] > vec[j + 1]) { # This sets up the inner if statement. SO if vec[j]>vec[j+1] then
-      #          s = vec[j] # s is equal to the number in the jth position of vec
-       #         vec[j] = vec[j+1] # and vec now equals the number in the jth+1 position
-        #        vec[j+1] = s # this renames the variable s, which is a temporary holding variable 
-         #       no_swaps = no_swaps + 1 # this updates the vector no_swaps by incrementing by 1 so the loop can keep running
-          #  }
-        #}
-        #no_passes = no_passes + 1 # the vector no_passes is incremented by 1 so the loop can continue
-        #if(no_swaps == 0) break # Break from the for loop if the variable no_swaps is equal to 0
-   # }
-    #vec # print the final result "vec"
-#}
 ```
 
 ### Problem 3: Applying the Sort with dice rolls
@@ -113,15 +93,12 @@ return (x)
 Apply Bubble sort to each row of your matrix to sort the data. (You may wish to do this within your loop so the rows are sorted as they get added.) 
 
 ```{r}
-x_update<-x
-for (i in 1:nrow(x)){
-  x_update[i,]<-bubblesort(x[i,])
+x_sorted<-x
+for(i in 1:nrow(x)){
+x_sorted[i,]<-bubblesort(x[i,])
 }
-
-x_update
-
+x_sorted
 ```
-
 
 
 ### Problem 4: Looking for Yahtzee Combinations
@@ -155,32 +132,38 @@ These would all be correctly identified.  But what about:
 As you can see, these would all fulfill the first and third conditions proposed above, but they should be classified as Full House.  Therefore  we also need to check for a Full House in these cases.  The following identification routine checks for these types of Hands. At each stage, we have to be very careful that all possibilities are accounted for.
 
 ```{r}
-x <- bubble_sort(sample(1:6, size=5, replace=T))
+handname<-function(y) {
+x <- bubblesort(y)
 
-if (x[1]=x[5]){
+if (x[1]==x[5]){
   hand="Yahtzee"
-} else if (x[1]=x[4] | x[2]=x[5]) {
+} else if (x[1]==x[4] | x[2]==x[5]) {
     hand="4ofKind"
-  
-}else if (x[4]=x[5]& x[1]=x[3] | x[3]=x[5]& x[1]=x[2] ){
-  hand="FullHouse"
-}
-else if (x[1]=x[3]| x[2]=x[4]|x[3]=x[5]){
-  hand="3ofKind"
-} else if (x[1]=x[2]=x[3]=x[4]|x[2]=x[3]=x[4]=x[5]){
-  hand="Small"
-}
-
-Small Straight (four consecutive numbers)
-- Large Straight (five consecutive numbers)
-...
-
- 
+} else if (x[1]==x[3] & x[4]==x[5] | x[3]==x[5] & x[1]==x[2]) {
+    hand="FullHouse"
+}  else if (x[1]==x[3] & x[4]!=x[5] | x[2]==x[4] & x[1]!=x[5] | x[3]==x[5] & x[1]!=x[2]) {
+    hand="ThreeOfAKind"
+} else if (x[1]+1==x[2] & x[2]+1==x[3] & x[3]+1==x[4] & x[4]+1==x[5]){
+    hand="Large Straight"
+} else if (x[3]==x[2]+1 & x[4]==x[3]+1 & x[2]==x[1]+1 |
+    x[3]==x[2]+1 & x[4]==x[3]+1 & x[5]==x[4]+1 |
+    x[2]==x[1]+1 & x[3]==x[2] & x[4]==x[3]+1  & x[5]==x[4]+1 | 
+    x[2]==x[1]+1 & x[3]==x[2]+1 & x[4]==x[3] & x[5]==x[4]+1) {
+    hand = "SmallStraight"
+} else {
  hand="Chance"
+}
+return(hand)
+}
 ```
 
 The above code lays this out for Yahtzee and 4 of a kind. Find statements that work for the rest. Make sets of x and test them to make sure they work.
 
+```{r}
+y<-sample(1:6, size=5, replace=T)
+handname(y) 
+sort(y)
+```
 
 
 ### Problem 5: Simulating 100,000 dice rolls
@@ -205,6 +188,13 @@ Small Straight    .1235
 Chance            .6326
 -------------------------------------------------------
 
+```{r}
+blanktable<-matrix('',nrow=100000)
+for(i in 1:nrow(blanktable)){
+ blanktable[i,]=handname(sample(1:6, size=5, replace=T))
+}
+table(blanktable)/nrow(blanktable)
+```
 
 
 ## Part II: PHP 2560 Only
@@ -216,8 +206,10 @@ Standardizing a variable means subtracting the mean, and then dividing by the st
 
 ```{r}
 
-suppressMessages(library(foreign))
-wcgs <- read.dta("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
+#suppressMessages(library(foreign))
+#wcgs <- read.dta("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
+library(haven)
+wcgs <- read_stata("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
 ```
 
 The data has the following variables:
@@ -293,36 +285,43 @@ bmi     Body Mass Index
 
 A. Create a function called standardize.me() that takes a numeric vector as an argument, and returns the standardized version of the vector. 
 ```{r}
-x=WCGS.new
+library(dplyr)
 
-standardize.me<-function(x)
-  {answer<-matrix(ncol=ncol(x),nrow=nrow(x))
-
-  for (i in 1:ncol(x)){
- answer[,i]<-(x[,i]- colMeans(x[i],na.rm=TRUE))/sd(x[,i],na.rm=TRUE)
-  }
-return(answer)
+standardize.me <- function(x) {
+  z= (x-mean(x,na.rm=TRUE))/sd(x,na.rm=TRUE)
+ z
 }
-
 ```
-
 B. Assign all the numeric columns of the original WCGS dataset to a new dataset called WCGS.new.
 ```{r}
-WCGS.new<-
-  wcgs%>%
-  select(age,height,weight,sbp,dbp,chol,ncigs,bmi)
+WCGS.new<-select(wcgs,id:chol,ncigs,time169,bmi,agecat)
+WCGS.new
 ```
 
 C. Using a loop and your new function, standardize all the variables WCGS.new dataset.
 ```{r}
-
-
-  standardize.me(WCGS.new)
-
-
+WCGS.new_z<-WCGS.new
+for (i in 1:11){
+WCGS.new_z[,i]<-standardize.me(as.matrix(WCGS.new[,i]))
+}
+WCGS.new_z
 ```
 
 D. What should the mean and standard deviation of all your new standardized variables be? Test your prediction by running a loop
+```{r}
+
+WCGS.new_z_total<-WCGS.new[1:2,]
+for (i in 1:11){
+WCGS.new_z_total[1,i]<-round(mean(as.matrix(WCGS.new_z[,i]),na.rm=TRUE))
+WCGS.new_z_total[2,i]<-round(sd(as.matrix(WCGS.new_z[,i]),na.rm=TRUE))
+}
+WCGS.new_z_total<-as.data.frame(WCGS.new_z_total)
+rownames(WCGS.new_z_total)<-c("Z Mean","Z SD")
+WCGS.new_z_total
+
+#The mean of all standardized values should be 0 for all columns, and the standard deviation should be 1 for all columns by definition of a standard normal mu=0, sd=1
+```
+
 
 
 
@@ -330,5 +329,22 @@ D. What should the mean and standard deviation of all your new standardized vari
 ### Question 7: Looping to Calculate
 
 A. Using a loop, calculate the mean weight of the subjects separated by the type of CHD they have.
+```{r}
+onlyweightchd<- select(wcgs,weight,chd69)
+WCGS_weight_chd<-onlyweightchd[1:2,]
+
+for (i in 1:2){
+WCGS_weight_chd[i,2]<-i-1
+
+WCGS_weight_chd[i,1]<-onlyweightchd %>% filter(chd69==i-1) %>% select(weight) %>% as.matrix() %>% mean(,na.rm=TRUE)
+}
+WCGS_weight_chd
+```
 B. Now do the same thing, but now don’t use a loop
+```{r}
+onlyweightchd<- select(wcgs,weight,chd69)
+WCGS_weight_chd<-onlyweightchd[1:2,]
+
+onlyweightchd %>% group_by(chd69) %>% summarise(mean=mean(weight))
+```
 
