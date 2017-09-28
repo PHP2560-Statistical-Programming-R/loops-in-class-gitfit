@@ -145,8 +145,11 @@ if (x[1]==x[5]){
     hand="ThreeOfAKind"
 } else if (x[1]+1==x[2] & x[2]+1==x[3] & x[3]+1==x[4] & x[4]+1==x[5]){
     hand="Large Straight"
-} else if (x[1]+1==x[2] & x[2]+1==x[3] & x[3]+1==x[4] & x[4]+1!=x[5] | x[2]+1==x[3] & x[3]+1==x[4] & x[4]+1==x[5] & x[1]+1!=x[2]){
-    hand="Small Straight"
+} else if (x[3]==x[2]+1 & x[4]==x[3]+1 & x[2]==x[1]+1 |
+    x[3]==x[2]+1 & x[4]==x[3]+1 & x[5]==x[4]+1 |
+    x[2]==x[1]+1 & x[3]==x[2] & x[4]==x[3]+1  & x[5]==x[4]+1 | 
+    x[2]==x[1]+1 & x[3]==x[2]+1 & x[4]==x[3] & x[5]==x[4]+1) {
+    hand = "SmallStraight"
 } else {
  hand="Chance"
 }
@@ -156,6 +159,11 @@ return(hand)
 
 The above code lays this out for Yahtzee and 4 of a kind. Find statements that work for the rest. Make sets of x and test them to make sure they work.
 
+```{r}
+y<-sample(1:6, size=5, replace=T)
+handname(y) 
+sort(y)
+```
 
 
 ### Problem 5: Simulating 100,000 dice rolls
@@ -181,11 +189,11 @@ Chance            .6326
 -------------------------------------------------------
 
 ```{r}
-table_1<-matrix('',nrow=100000)
-for(i in 1:nrow(table_1)){
- table_1[i]=handname(sample(1:6, size=5, replace=T))
+blanktable<-matrix('',nrow=100000)
+for(i in 1:nrow(blanktable)){
+ blanktable[i,]=handname(sample(1:6, size=5, replace=T))
 }
-table(table_1)/nrow(table_1)
+table(blanktable)/nrow(blanktable)
 ```
 
 
@@ -196,10 +204,12 @@ table(table_1)/nrow(table_1)
 
 Standardizing a variable means subtracting the mean, and then dividing by the standard deviation. Let’s use a loop to standardize the numeric columns in the [Western Collaborative Group Study](https://clinicaltrials.gov/ct2/show/NCT00005174). This study began in 1960 with 3154 men ages 39-59, who were employed in one of 11 California based companies. They were followed until 1969 during this time, 257 of these men developed coronary heart disease (CHD). You can read this data in with the code below. You can access this dataset with the following code:
 
-```
+```{r}
 
-suppressMessages(library(foreign))
-wcgs <- read.dta("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
+#suppressMessages(library(foreign))
+#wcgs <- read.dta("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
+library(haven)
+wcgs <- read_stata("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
 ```
 
 The data has the following variables:
@@ -274,9 +284,44 @@ bmi     Body Mass Index
 ### Question 6: Standardize Function
 
 A. Create a function called standardize.me() that takes a numeric vector as an argument, and returns the standardized version of the vector. 
+```{r}
+library(dplyr)
+
+standardize.me <- function(x) {
+  z= (x-mean(x,na.rm=TRUE))/sd(x,na.rm=TRUE)
+ z
+}
+```
 B. Assign all the numeric columns of the original WCGS dataset to a new dataset called WCGS.new.
+```{r}
+WCGS.new<-select(wcgs,id:chol,ncigs,time169,bmi,agecat)
+WCGS.new
+```
+
 C. Using a loop and your new function, standardize all the variables WCGS.new dataset.
+```{r}
+WCGS.new_z<-WCGS.new
+for (i in 1:11){
+WCGS.new_z[,i]<-standardize.me(as.matrix(WCGS.new[,i]))
+}
+WCGS.new_z
+```
+
 D. What should the mean and standard deviation of all your new standardized variables be? Test your prediction by running a loop
+```{r}
+
+WCGS.new_z_total<-WCGS.new[1:2,]
+for (i in 1:11){
+WCGS.new_z_total[1,i]<-round(mean(as.matrix(WCGS.new_z[,i]),na.rm=TRUE))
+WCGS.new_z_total[2,i]<-round(sd(as.matrix(WCGS.new_z[,i]),na.rm=TRUE))
+}
+WCGS.new_z_total<-as.data.frame(WCGS.new_z_total)
+rownames(WCGS.new_z_total)<-c("Z Mean","Z SD")
+WCGS.new_z_total
+
+#The mean of all standardized values should be 0 for all columns, and the standard deviation should be 1 for all columns by definition of a standard normal mu=0, sd=1
+```
+
 
 
 
@@ -284,5 +329,22 @@ D. What should the mean and standard deviation of all your new standardized vari
 ### Question 7: Looping to Calculate
 
 A. Using a loop, calculate the mean weight of the subjects separated by the type of CHD they have.
+```{r}
+onlyweightchd<- select(wcgs,weight,chd69)
+WCGS_weight_chd<-onlyweightchd[1:2,]
+
+for (i in 1:2){
+WCGS_weight_chd[i,2]<-i-1
+
+WCGS_weight_chd[i,1]<-onlyweightchd %>% filter(chd69==i-1) %>% select(weight) %>% as.matrix() %>% mean(,na.rm=TRUE)
+}
+WCGS_weight_chd
+```
 B. Now do the same thing, but now don’t use a loop
+```{r}
+onlyweightchd<- select(wcgs,weight,chd69)
+WCGS_weight_chd<-onlyweightchd[1:2,]
+
+onlyweightchd %>% group_by(chd69) %>% summarise(mean=mean(weight))
+```
 

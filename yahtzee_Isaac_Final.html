@@ -9,6 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
+<meta name="author" content="Isaac Zhao" />
 
 <meta name="date" content="2017-09-27" />
 
@@ -117,11 +118,13 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Loops and basic functions</h1>
+<h4 class="author"><em>Isaac Zhao</em></h4>
 <h4 class="date"><em>September 27, 2017</em></h4>
 
 </div>
 
 
+<p>hello</p>
 <p>In this project we will consider loops and basic functions. To begin we will work on using loops to simulate a famous dice game: Yahtzee.</p>
 <div id="part-1-yahtzee" class="section level1">
 <h1>Part 1: Yahtzee</h1>
@@ -139,7 +142,7 @@ $(document).ready(function () {
 </ul>
 <p>We begin by simulating dice rolls. For example we can simulate one roll of a die to be:</p>
 <pre class="r"><code>sample(1:6, size=1, replace=T)</code></pre>
-<pre><code>## [1] 4</code></pre>
+<pre><code>## [1] 6</code></pre>
 <div id="problem-1-dice-rolls" class="section level3">
 <h3>Problem 1: Dice Rolls</h3>
 <p>Using a loop create a matrix of 10 rolls all consisting of 5 dice in each roll.</p>
@@ -150,16 +153,16 @@ for (i in 1:10)
 }
 x</code></pre>
 <pre><code>##       [,1] [,2] [,3] [,4] [,5]
-##  [1,]    6    1    4    1    6
-##  [2,]    1    1    3    1    1
-##  [3,]    3    5    5    6    3
-##  [4,]    1    3    4    2    6
-##  [5,]    2    5    5    3    4
-##  [6,]    2    4    4    6    3
-##  [7,]    6    6    3    4    3
-##  [8,]    5    5    2    4    6
-##  [9,]    5    3    5    5    4
-## [10,]    4    4    4    2    2</code></pre>
+##  [1,]    4    4    6    5    2
+##  [2,]    1    5    3    3    2
+##  [3,]    1    3    3    6    1
+##  [4,]    5    5    2    5    6
+##  [5,]    6    5    5    6    5
+##  [6,]    6    5    2    1    6
+##  [7,]    6    6    3    3    1
+##  [8,]    4    5    1    3    3
+##  [9,]    2    4    3    2    4
+## [10,]    5    2    6    5    2</code></pre>
 </div>
 <div id="prolem-2-sorting-dice-rolls" class="section level3">
 <h3>Prolem 2: Sorting Dice Rolls</h3>
@@ -177,44 +180,14 @@ x</code></pre>
  [9,]    4    4    4    6    2
 [10,]    6    6    1    4    6</code></pre>
 <p>We will need to sort this. The following function is called a <em>Bubble Sort</em>. Comment on every part of the code to explain what it is doing:</p>
-<pre class="r"><code># create a function of the name bubble_sort by having vec as a variable
-bubble_sort = function(vec) {
-    no_passes = 0
-  #set no passes=0
-    while(1) {
-    #while loop is used to continue running the function if no swaps is greater than 0
-        no_swaps = 0
-        #initialize the vector and set no_swaps=0
-        for (j in 1 : (length(vec) - 1 - no_passes)) {
-          #initialize the for loop where it loops from the start through the entire length of the vector
-            if (vec[j] &gt; vec[j + 1]) {
-              #if the vector satisifies this statement where j&gt;j+1 then it will output the function listed below
-                s = vec[j]
-                #s equals the number within the j position
-                vec[j] = vec[j+1]
-                #updating the value in the j position to j+1
-                vec[j+1] = s
-                #the new value of s is equal to j+1
-                no_swaps = no_swaps + 1
-                #updates no_swaps by adding 1 to it
-            }
-        }
-        no_passes = no_passes + 1
-        #updates no_passes by adding 1 to it
-        if(no_swaps == 0) break
-        #if no_swaps=0 then it will &quot;break&quot; or stop looping and print out vec
-    }
-    vec
-}</code></pre>
-</div>
-<div id="problem-3-applying-the-sort-with-dice-rolls" class="section level3">
-<h3>Problem 3: Applying the Sort with dice rolls</h3>
-<p>Apply Bubble sort to each row of your matrix to sort the data. (You may wish to do this within your loop so the rows are sorted as they get added.)</p>
 <pre class="r"><code>bubblesort &lt;- function(x) {
+# x is initially the input vector and will be
+# modified to form the output
 if (length(x) &lt; 2) return (x)
+# last is the last element to compare with
 for(last in length(x):2) {
 for(first in 1:(last - 1)) {
-if(x[first] &gt; x[first + 1]) { 
+if(x[first] &gt; x[first + 1]) { # swap the pair
 save &lt;- x[first]
 x[first] &lt;- x[first + 1]
 x[first + 1] &lt;- save
@@ -222,35 +195,27 @@ x[first + 1] &lt;- save
 }
 }
 return (x)
-}
-bubblesort(x)</code></pre>
-<pre><code>##       [,1] [,2] [,3] [,4] [,5]
-##  [1,]    1    2    3    4    5
-##  [2,]    1    2    3    4    5
-##  [3,]    1    2    4    4    6
-##  [4,]    1    3    4    5    6
-##  [5,]    1    3    4    5    6
-##  [6,]    1    3    4    5    6
-##  [7,]    1    3    4    5    6
-##  [8,]    2    3    4    5    6
-##  [9,]    2    3    4    5    6
-## [10,]    2    3    4    5    6</code></pre>
-<pre class="r"><code>y&lt;-x
+}</code></pre>
+</div>
+<div id="problem-3-applying-the-sort-with-dice-rolls" class="section level3">
+<h3>Problem 3: Applying the Sort with dice rolls</h3>
+<p>Apply Bubble sort to each row of your matrix to sort the data. (You may wish to do this within your loop so the rows are sorted as they get added.)</p>
+<pre class="r"><code>x_sorted&lt;-x
 for(i in 1:nrow(x)){
-  y[i,]&lt;-bubblesort(x[i,])
+x_sorted[i,]&lt;-bubblesort(x[i,])
 }
-y</code></pre>
+x_sorted</code></pre>
 <pre><code>##       [,1] [,2] [,3] [,4] [,5]
-##  [1,]    1    1    4    6    6
-##  [2,]    1    1    1    1    3
-##  [3,]    3    3    5    5    6
-##  [4,]    1    2    3    4    6
-##  [5,]    2    3    4    5    5
-##  [6,]    2    3    4    4    6
-##  [7,]    3    3    4    6    6
-##  [8,]    2    4    5    5    6
-##  [9,]    3    4    5    5    5
-## [10,]    2    2    4    4    4</code></pre>
+##  [1,]    2    4    4    5    6
+##  [2,]    1    2    3    3    5
+##  [3,]    1    1    3    3    6
+##  [4,]    2    5    5    5    6
+##  [5,]    5    5    5    6    6
+##  [6,]    1    2    5    6    6
+##  [7,]    1    3    3    6    6
+##  [8,]    1    3    3    4    5
+##  [9,]    2    2    3    4    4
+## [10,]    2    2    5    5    6</code></pre>
 </div>
 <div id="problem-4-looking-for-yahtzee-combinations" class="section level3">
 <h3>Problem 4: Looking for Yahtzee Combinations</h3>
@@ -267,27 +232,35 @@ y</code></pre>
 <pre><code>    1 1 1 2 2
     3 3 5 5 5</code></pre>
 <p>As you can see, these would all fulfill the first and third conditions proposed above, but they should be classified as Full House. Therefore we also need to check for a Full House in these cases. The following identification routine checks for these types of Hands. At each stage, we have to be very careful that all possibilities are accounted for.</p>
-<pre class="r"><code>result&lt;- function(y){
-x &lt;- bubblesort(sample(1:6, size=5, replace=T))
+<pre class="r"><code>handname&lt;-function(y) {
+x &lt;- bubblesort(y)
 
-if (TRUE &amp;&amp; x[1] == x[5]){
+if (x[1]==x[5]){
   hand=&quot;Yahtzee&quot;
-} else if (x[1] == x[4] | x[2] == x[5]) {
+} else if (x[1]==x[4] | x[2]==x[5]) {
     hand=&quot;4ofKind&quot;
-} else if ((x[1] == x[3] &amp; x[4] == x[5]) | (x[2] == x[4] &amp; x[1]==x[5]) | (x[3]==x[5] &amp; x[1]==x[2])){
-  hand=&quot;FullHouse&quot;
-} else if ((x[1]==x[3] &amp; x[4] != x[5])|(x[2] ==x[4] &amp; x[1]!=x[5])| (x[3]==x[5] &amp; x[1]!=x[2])){
-hand=&quot;ThreeofKind&quot;
-} else if (((x[4]== (x[3]+1) &amp; x[3] == (x[2]+1) &amp; x[2]==(x[1]+1) &amp; x[5]!=(x[1]+4))| x[5]==(x[4]+1) &amp; x[4]== (x[3]+1) &amp; x[3]== (x[2]+1) &amp; x[5]!= (x[1]+4) )| (x[1]==x[2] &amp; x[3]==(x[2]+1) &amp; x[4]==(x[3]+1) &amp; x[5]== (x[4]+1)) | (x[2]=x[3] &amp; x[4]==(x[3]+1) &amp; x[5]==(x[4]+1)&amp; x[2]==(x[1]+1)) | (x[3]==x[4] &amp; x[3]==(x[2]+1) &amp; x[2]==(x[1]+1) &amp; x[5]==(x[4]+1)) | x[5]==x[4] &amp; x[4]==(x[3]+1) &amp; x[3]==(x[2]+1) &amp; x[2]==(x[1]+1)){
-   hand=&quot;SmallStraight&quot;
-} else if(x[5]==(x[1]+4) &amp; x[5]==(x[4]+1) &amp; x[4]==(x[3]+1) &amp; x[3]==(x[2]+1)&amp; x[2]==(x[1]+1)){
-   hand=&quot;LargeStraight&quot;
- }else {
-   hand=&quot;Chance&quot;
- }
+} else if (x[1]==x[3] &amp; x[4]==x[5] | x[3]==x[5] &amp; x[1]==x[2]) {
+    hand=&quot;FullHouse&quot;
+}  else if (x[1]==x[3] &amp; x[4]!=x[5] | x[2]==x[4] &amp; x[1]!=x[5] | x[3]==x[5] &amp; x[1]!=x[2]) {
+    hand=&quot;ThreeOfAKind&quot;
+} else if (x[1]+1==x[2] &amp; x[2]+1==x[3] &amp; x[3]+1==x[4] &amp; x[4]+1==x[5]){
+    hand=&quot;Large Straight&quot;
+} else if (x[3]==x[2]+1 &amp; x[4]==x[3]+1 &amp; x[2]==x[1]+1 |
+    x[3]==x[2]+1 &amp; x[4]==x[3]+1 &amp; x[5]==x[4]+1 |
+    x[2]==x[1]+1 &amp; x[3]==x[2] &amp; x[4]==x[3]+1  &amp; x[5]==x[4]+1 | 
+    x[2]==x[1]+1 &amp; x[3]==x[2]+1 &amp; x[4]==x[3] &amp; x[5]==x[4]+1) {
+    hand = &quot;SmallStraight&quot;
+} else {
+ hand=&quot;Chance&quot;
+}
 return(hand)
 }</code></pre>
 <p>The above code lays this out for Yahtzee and 4 of a kind. Find statements that work for the rest. Make sets of x and test them to make sure they work.</p>
+<pre class="r"><code>y&lt;-sample(1:6, size=5, replace=T)
+handname(y) </code></pre>
+<pre><code>## [1] &quot;Chance&quot;</code></pre>
+<pre class="r"><code>sort(y)</code></pre>
+<pre><code>## [1] 1 3 4 5 5</code></pre>
 </div>
 <div id="problem-5-simulating-100000-dice-rolls" class="section level3">
 <h3>Problem 5: Simulating 100,000 dice rolls</h3>
@@ -334,23 +307,25 @@ return(hand)
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>table_1&lt;-matrix('',nrow=100000)
-for(i in 1:nrow(table_1)){
- table_1[i]=result(sample(1:6, size=5, replace=T))
+<pre class="r"><code>blanktable&lt;-matrix('',nrow=100000)
+for(i in 1:nrow(blanktable)){
+ blanktable[i,]=handname(sample(1:6, size=5, replace=T))
 }
-table(table_1)/nrow(table_1)</code></pre>
-<pre><code>## table_1
-##       4ofKind        Chance     FullHouse SmallStraight   ThreeofKind 
-##       0.01917       0.63933       0.03888       0.14815       0.15367 
-##       Yahtzee 
-##       0.00080</code></pre>
+table(blanktable)/nrow(blanktable)</code></pre>
+<pre><code>## blanktable
+##        4ofKind         Chance      FullHouse Large Straight  SmallStraight 
+##        0.01902        0.63476        0.03871        0.03084        0.12335 
+##   ThreeOfAKind        Yahtzee 
+##        0.15259        0.00073</code></pre>
 </div>
 <div id="part-ii-php-2560-only" class="section level2">
 <h2>Part II: PHP 2560 Only</h2>
 <p>Standardizing a variable means subtracting the mean, and then dividing by the standard deviation. Let’s use a loop to standardize the numeric columns in the <a href="https://clinicaltrials.gov/ct2/show/NCT00005174">Western Collaborative Group Study</a>. This study began in 1960 with 3154 men ages 39-59, who were employed in one of 11 California based companies. They were followed until 1969 during this time, 257 of these men developed coronary heart disease (CHD). You can read this data in with the code below. You can access this dataset with the following code:</p>
-<pre><code>
-suppressMessages(library(foreign))
-wcgs &lt;- read.dta(&quot;https://drive.google.com/uc?export=download&amp;id=0B8CsRLdwqzbzYWxfN3ExQllBQkU&quot;)</code></pre>
+<pre class="r"><code>#suppressMessages(library(foreign))
+#wcgs &lt;- read.dta(&quot;https://drive.google.com/uc?export=download&amp;id=0B8CsRLdwqzbzYWxfN3ExQllBQkU&quot;)
+library(haven)</code></pre>
+<pre><code>## Warning: package 'haven' was built under R version 3.2.5</code></pre>
+<pre class="r"><code>wcgs &lt;- read_stata(&quot;https://drive.google.com/uc?export=download&amp;id=0B8CsRLdwqzbzYWxfN3ExQllBQkU&quot;)</code></pre>
 <p>The data has the following variables:</p>
 <p>WCGS has the following variables:</p>
 <table style="width:71%;">
@@ -481,11 +456,101 @@ wcgs &lt;- read.dta(&quot;https://drive.google.com/uc?export=download&amp;id=0B8
 </table>
 <div id="question-6-standardize-function" class="section level3">
 <h3>Question 6: Standardize Function</h3>
-<p>A. Create a function called standardize.me() that takes a numeric vector as an argument, and returns the standardized version of the vector. B. Assign all the numeric columns of the original WCGS dataset to a new dataset called WCGS.new. C. Using a loop and your new function, standardize all the variables WCGS.new dataset. D. What should the mean and standard deviation of all your new standardized variables be? Test your prediction by running a loop</p>
+<p>A. Create a function called standardize.me() that takes a numeric vector as an argument, and returns the standardized version of the vector.</p>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## Warning: package 'dplyr' was built under R version 3.2.5</code></pre>
+<pre><code>## 
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>standardize.me &lt;- function(x) {
+  z= (x-mean(x,na.rm=TRUE))/sd(x,na.rm=TRUE)
+ z
+}</code></pre>
+<p>B. Assign all the numeric columns of the original WCGS dataset to a new dataset called WCGS.new.</p>
+<pre class="r"><code>WCGS.new&lt;-select(wcgs,id:chol,ncigs,time169,bmi,agecat)
+WCGS.new</code></pre>
+<pre><code>## # A tibble: 3,154 x 11
+##       id   age height weight   sbp   dbp  chol ncigs time169      bmi
+##    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+##  1  2343    50     67    200   132    90   249    25    1367 31.32101
+##  2  3656    51     73    192   120    74   194    25    2991 25.32858
+##  3  3526    59     70    200   158    94   258     0    2960 28.69388
+##  4 22057    51     69    150   126    80   173     0    3069 22.14871
+##  5 12927    44     71    160   126    80   214     0    3081 22.31303
+##  6 16029    47     64    158   116    76   206    80    2114 27.11768
+##  7  3894    40     70    162   122    78   190     0    2929 23.24204
+##  8 11389    41     70    160   130    84   212    25    3010 22.95510
+##  9 12681    50     71    195   112    70   130     0    3104 27.19401
+## 10 10005    43     68    187   120    80   233    25    2861 28.43015
+## # ... with 3,144 more rows, and 1 more variables: agecat &lt;dbl&gt;</code></pre>
+<p>C. Using a loop and your new function, standardize all the variables WCGS.new dataset.</p>
+<pre class="r"><code>WCGS.new_z&lt;-WCGS.new
+for (i in 1:11){
+WCGS.new_z[,i]&lt;-standardize.me(as.matrix(WCGS.new[,i]))
+}
+WCGS.new_z</code></pre>
+<pre><code>## # A tibble: 3,154 x 11
+##             id        age      height     weight         sbp        dbp
+##          &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
+##  1 -1.38411135  0.6736560 -1.09848926  1.4242809  0.22272872  0.8208659
+##  2 -1.16071234  0.8546828  1.27427763  1.0450578 -0.57104121 -0.8240603
+##  3 -1.18283105  2.3028969  0.08789419  1.4242809  1.94256358  1.2320975
+##  4  1.97010654  0.8546828 -0.30756696 -0.9458634 -0.17415624 -0.2072130
+##  5  0.41669225 -0.4125045  0.48335534 -0.4718346 -0.17415624 -0.2072130
+##  6  0.94447879  0.1305757 -2.28487270 -0.5666403 -0.83563119 -0.6184446
+##  7 -1.12021807 -1.1366116  0.08789419 -0.3770288 -0.43874622 -0.4128288
+##  8  0.15501085 -0.9555848  0.08789419 -0.4718346  0.09043373  0.2040186
+##  9  0.37483684  0.6736560  0.48335534  1.1872665 -1.10022117 -1.2352919
+## 10 -0.08046838 -0.5935313 -0.70302811  0.8080434 -0.57104121 -0.2072130
+## # ... with 3,144 more rows, and 5 more variables: chol &lt;dbl&gt;, ncigs &lt;dbl&gt;,
+## #   time169 &lt;dbl&gt;, bmi &lt;dbl&gt;, agecat &lt;dbl&gt;</code></pre>
+<p>D. What should the mean and standard deviation of all your new standardized variables be? Test your prediction by running a loop</p>
+<pre class="r"><code>WCGS.new_z_total&lt;-WCGS.new[1:2,]
+for (i in 1:11){
+WCGS.new_z_total[1,i]&lt;-round(mean(as.matrix(WCGS.new_z[,i]),na.rm=TRUE))
+WCGS.new_z_total[2,i]&lt;-round(sd(as.matrix(WCGS.new_z[,i]),na.rm=TRUE))
+}
+WCGS.new_z_total&lt;-as.data.frame(WCGS.new_z_total)
+rownames(WCGS.new_z_total)&lt;-c(&quot;Z Mean&quot;,&quot;Z SD&quot;)
+WCGS.new_z_total</code></pre>
+<pre><code>##        id age height weight sbp dbp chol ncigs time169 bmi agecat
+## Z Mean  0   0      0      0   0   0    0     0       0   0      0
+## Z SD    1   1      1      1   1   1    1     1       1   1      1</code></pre>
+<pre class="r"><code>#The mean of all standardized values should be 0 for all columns, and the standard deviation should be 1 for all columns by definition of a standard normal mu=0, sd=1</code></pre>
 </div>
 <div id="question-7-looping-to-calculate" class="section level3">
 <h3>Question 7: Looping to Calculate</h3>
-<p>A. Using a loop, calculate the mean weight of the subjects separated by the type of CHD they have. B. Now do the same thing, but now don’t use a loop</p>
+<p>A. Using a loop, calculate the mean weight of the subjects separated by the type of CHD they have.</p>
+<pre class="r"><code>onlyweightchd&lt;- select(wcgs,weight,chd69)
+WCGS_weight_chd&lt;-onlyweightchd[1:2,]
+
+for (i in 1:2){
+WCGS_weight_chd[i,2]&lt;-i-1
+
+WCGS_weight_chd[i,1]&lt;-onlyweightchd %&gt;% filter(chd69==i-1) %&gt;% select(weight) %&gt;% as.matrix() %&gt;% mean(,na.rm=TRUE)
+}</code></pre>
+<pre><code>## Warning: package 'bindrcpp' was built under R version 3.2.5</code></pre>
+<pre class="r"><code>WCGS_weight_chd</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##     weight     chd69
+##      &lt;dbl&gt; &lt;dbl+lbl&gt;
+## 1 169.5537         0
+## 2 174.4630         1</code></pre>
+<p>B. Now do the same thing, but now don’t use a loop</p>
+<pre class="r"><code>onlyweightchd&lt;- select(wcgs,weight,chd69)
+WCGS_weight_chd&lt;-onlyweightchd[1:2,]
+
+onlyweightchd %&gt;% group_by(chd69) %&gt;% summarise(mean=mean(weight))</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##       chd69     mean
+##   &lt;dbl+lbl&gt;    &lt;dbl&gt;
+## 1         0 169.5537
+## 2         1 174.4630</code></pre>
 </div>
 </div>
 </div>
