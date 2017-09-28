@@ -23,13 +23,13 @@ Anyone not familiar with Yahtzee should try a web search for the rules of the ga
 
 All you really need to know for this lesson, though, is which combinations are counted.  We will call these "hands," as the combinations in poker are called.  The hands in Yahtzee are:
 
-- Three of a Kind (three of one number and two others that are different)
-- Full House (three of one number and two of another number)
-- Four of a Kind (four of one number and one other)
-- Yahtzee (five of the same number)
-- Small Straight (four consecutive numbers)
-- Large Straight (five consecutive numbers)
-- Chance (anything that does not fit the above patterns)
+- Three of a Kind (three of one number and two others that are different) [ ]
+- Full House (three of one number and two of another number) [ ]
+- Four of a Kind (four of one number and one other) [x]
+- Yahtzee (five of the same number) [x]
+- Small Straight (four consecutive numbers) [ ]
+- Large Straight (five consecutive numbers) [x]
+- Chance (anything that does not fit the above patterns) [x]
 
 We begin by simulating dice rolls. For example we can simulate one roll of a die to be:
 ```{r}
@@ -42,7 +42,7 @@ sample(1:6, size=1, replace=T)
 Using a loop create a matrix of 10 rolls all consisting of 5 dice in each roll. 
 
 ```{r}
-x <- matrix(, nrow=10, ncol=5)
+x <- matrix(nrow=10, ncol=5)
 for (i in 1:10)
   {
   x[i,] <- sample(1:6, size=5, replace=T)
@@ -70,23 +70,41 @@ x
 ```
 We will need to sort this. The following function is called a *Bubble Sort*. Comment on every part of the code to explain what it is doing:
 
-```
-bubble_sort = function(vec) {
-    no_passes = 0
-    while(1) {
-        no_swaps = 0
-        for (j in 1 : (length(vec) - 1 - no_passes)) {
-            if (vec[j] > vec[j + 1]) {
-                s = vec[j]
-                vec[j] = vec[j+1]
-                vec[j+1] = s
-                no_swaps = no_swaps + 1
+```{r}
+bubble_sort = function(vec) { # create function with an argument vec
+    no_passes = 0 # set no_passes to 0
+    while(1) { # iterate
+        no_swaps = 0 # set no_swaps to 0
+        for (j in 1 : (length(vec) - 1 - no_passes)) { # for the next element
+            if (vec[j] > vec[j + 1]) { # if the element is greater than the next element
+                s = vec[j] # store element in temporary variable
+                vec[j] = vec[j+1] # put next element in current element's spot
+                vec[j+1] = s # put temporary variable element in next element's spot (ie swap the two elements)
+                no_swaps = no_swaps + 1 # increment the number of swaps
             }
         }
-        no_passes = no_passes + 1
-        if(no_swaps == 0) break
+        no_passes = no_passes + 1 # increment the number of passes
+        if(no_swaps == 0) break # stop iterating when the number of swaps is 0
     }
     vec
+}
+```
+```{r}
+bubblesort <- function(x) {
+# x is initially the input vector and will be
+# modified to form the output
+if (length(x) < 2) return (x)
+# last is the last element to compare with
+for(last in length(x):2) {
+  for(first in 1:(last - 1)) {
+    if(x[first] > x[first + 1]) { # swap the pair
+      save <- x[first]
+      x[first] <- x[first + 1]
+      x[first + 1] <- save
+    }
+  }
+}
+return (x)
 }
 ```
 
@@ -94,7 +112,15 @@ bubble_sort = function(vec) {
 
 Apply Bubble sort to each row of your matrix to sort the data. (You may wish to do this within your loop so the rows are sorted as they get added.) 
 
-
+```{r}
+x <- matrix(nrow=10, ncol=5)
+for (i in 1:10)
+  {
+  x[i,] <- sample(1:6, size=5, replace=T)
+  x[i,] <- bubblesort(x[i,])
+}
+x
+```
 
 ### Problem 4: Looking for Yahtzee Combinations
 
@@ -126,19 +152,38 @@ These would all be correctly identified.  But what about:
 
 As you can see, these would all fulfill the first and third conditions proposed above, but they should be classified as Full House.  Therefore  we also need to check for a Full House in these cases.  The following identification routine checks for these types of Hands. At each stage, we have to be very careful that all possibilities are accounted for.
 
-```
+```{r}
 x <- bubble_sort(sample(1:6, size=5, replace=T))
 
-if (x[1]=x[5]){
-  hand="Yahtzee"
-} else if (x[1]=x[4] | x[2]=x[5]) {
-    hand="4ofKind"
-} 
-
-...
-
- } else 
- hand="Chance"
+hand_type <- function(x){
+  if (x[1] == x[5]){
+  hand = "Yahtzee"
+} else if (x[1] == x[4] | x[2] == x[5]) {
+    hand = "4ofKind"
+} else if (x[2] == x[1] + 1 & x[3] == x[2] + 1 & x[4] == x[3] + 1 & x[5] == x[4] + 1) {
+  hand = "LargeStraight"
+} else if (x[1] == x[3]) {
+  if(x[4] == x[5]){
+    hand = "FullHouse"
+  } else {
+    hand = "3ofKind"
+  }
+} else if (x[2] == x[4]) {
+  hand = "3ofKind"
+} else if (x[3] == x[5]) {
+  if(x[1] == x[2]){
+    hand = "FullHouse"
+  } else {
+    hand = "3ofKind"
+  }
+} else if (x[3] == x[2] + 1 & x[4] == x[3] + 1 & (x[2] == x[1] + 1 | x[5] == x[4] + 1) | 
+           (x[2] == x[1] + 1 & x[3] == x[2] & x[4] == x[3] + 1 & x[5] == x[4] + 1) |
+           x[2] == x[1] + 1 & x[3] == x[2] + 1 & x[4] == x[3] & x[5] == x[4] + 1){
+  hand = "SmallStraight"
+} else {
+ hand = "Chance"
+ }
+}
 ```
 
 The above code lays this out for Yahtzee and 4 of a kind. Find statements that work for the rest. Make sets of x and test them to make sure they work.
@@ -167,7 +212,18 @@ Small Straight    .1235
 Chance            .6326
 -------------------------------------------------------
 
+```{r}
+x <- matrix(nrow=100000, ncol=5)
+hand <- character(100000)
+for (i in 1:100000)
+  {
+  x[i,] <- sample(1:6, size=5, replace=T)
+  x[i,] <- bubblesort(x[i,])
+  hand[i] <- hand_type(x[i,])
+}
 
+table(hand)/100000
+```
 
 ## Part II: PHP 2560 Only
 
@@ -176,7 +232,7 @@ Chance            .6326
 
 Standardizing a variable means subtracting the mean, and then dividing by the standard deviation. Let’s use a loop to standardize the numeric columns in the [Western Collaborative Group Study](https://clinicaltrials.gov/ct2/show/NCT00005174). This study began in 1960 with 3154 men ages 39-59, who were employed in one of 11 California based companies. They were followed until 1969 during this time, 257 of these men developed coronary heart disease (CHD). You can read this data in with the code below. You can access this dataset with the following code:
 
-```
+```{r}
 
 suppressMessages(library(foreign))
 wcgs <- read.dta("https://drive.google.com/uc?export=download&id=0B8CsRLdwqzbzYWxfN3ExQllBQkU")
@@ -260,9 +316,7 @@ D. What should the mean and standard deviation of all your new standardized vari
 
 
 
-
 ### Question 7: Looping to Calculate
 
 A. Using a loop, calculate the mean weight of the subjects separated by the type of CHD they have.
 B. Now do the same thing, but now don’t use a loop
-
