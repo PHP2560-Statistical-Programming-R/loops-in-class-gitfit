@@ -73,39 +73,22 @@ We will need to sort this. The following function is called a *Bubble Sort*. Com
 
 ```{r}
 bubblesort <- function(x) {
-# x is initially the input vector and will be
-# modified to form the output
+# x is our input vector
 if (length(x) < 2) return (x)
-# last is the last element to compare with
+# if this statement holds then give x as the output
 for(last in length(x):2) {
 for(first in 1:(last - 1)) {
-if(x[first] > x[first + 1]) { # swap the pair
-save <- x[first]
-x[first] <- x[first + 1]
-x[first + 1] <- save
+if(x[first] > x[first + 1]) { # This says if a number is larger then the one that comes before it, then swap the two numbersand save it in a temporary holding place 
+save <- x[first] # this vector is the temporary holding for the swaps we make
+x[first] <- x[first + 1] #the first number is replaced by the number that comes after it
+x[first + 1] <- save #the second number is then replaced by the one that inititally came before it
 }
 }
 }
 return (x)
 }
 
-#bubble_sort = function(vec) { # Creating a function called bubble sort that takes the variable vec as an input
- #   no_passes = 0 # defining initial values. The number of passes
-  #  while(1) { # this tells R to run the function if the condiiton  no_swaps >0 is met
-   #     no_swaps = 0 #initialize the vector no_swaps which counts the number of swaps
-    #    for (j in 1 : (length(vec) - 1 - no_passes)) { # the loop runs the length of(vec) -1 -nopasses
-     #       if (vec[j] > vec[j + 1]) { # This sets up the inner if statement. SO if vec[j]>vec[j+1] then
-      #          s = vec[j] # s is equal to the number in the jth position of vec
-       #         vec[j] = vec[j+1] # and vec now equals the number in the jth+1 position
-        #        vec[j+1] = s # this renames the variable s, which is a temporary holding variable 
-         #       no_swaps = no_swaps + 1 # this updates the vector no_swaps by incrementing by 1 so the loop can keep running
-          #  }
-        #}
-        #no_passes = no_passes + 1 # the vector no_passes is incremented by 1 so the loop can continue
-        #if(no_swaps == 0) break # Break from the for loop if the variable no_swaps is equal to 0
-   # }
-    #vec # print the final result "vec"
-#}
+
 ```
 
 ### Problem 3: Applying the Sort with dice rolls
@@ -155,26 +138,29 @@ These would all be correctly identified.  But what about:
 As you can see, these would all fulfill the first and third conditions proposed above, but they should be classified as Full House.  Therefore  we also need to check for a Full House in these cases.  The following identification routine checks for these types of Hands. At each stage, we have to be very careful that all possibilities are accounted for.
 
 ```{r}
-namer<-function(z){
-x <- bubblesort(sample(1:6, size=5, replace=T))
+x <- bubblesort(sample(1:6,size=5,replace = T))
+namer<-function(x){
+
 
 if (x[1]==x[5]){
   hand="Yahtzee"
 } else if (x[1]==x[4] | x[2]==x[5]) {
     hand="4ofKind"
-  
+}else if ((x[1]==x[3] & x[4]!=x[5]) | (x[2]==x[4] & x[1]!=x[5]) | (x[3]==x[5] & x[1]!=x[2])){
+  hand="3ofKind"
 }else if (x[4]==x[5]& x[1]==x[3] | x[3]==x[5]& x[1]==x[2] ){
   hand="FullHouse"
-}else if (x[1]==x[3]| x[2]==x[4]|x[3]==x[5]){
-  hand="3ofKind"
-  }else if (x[2] == x[1] + 1 & x[3] == x[2] + 1 & x[4] == x[3] + 1 & x[5] == x[4] + 1) {
+  }else if (x[2] == x[1]+1 & x[3] == x[2]+1 & x[4] == x[3]+1 & x[5] == x[4] + 1) {
   hand = "LargeStraight"
 } else if (x[2]==(x[1]+1) & x[3]==(x[2]+1) & x[4]==(x[3]+1) |
-           x[3]==(x[2]+1) & x[4]==(x[3]+1) & x[5]==(x[4]+1)) {
+           x[3]==(x[2]+1) & x[4]==(x[3]+1) & x[5]==(x[4]+1)|
+           x[2]+2==x[4] & (x[3]+2)==x[5]){
+           
   hand="Small Straight"
 }else{
  hand="Chance"
 }
+  return(hand)
 }
 
 ```
@@ -182,6 +168,8 @@ if (x[1]==x[5]){
 The above code lays this out for Yahtzee and 4 of a kind. Find statements that work for the rest. Make sets of x and test them to make sure they work.
 ```{r}
 z<-sample(1:6, size=5, replace=T)
+namer(z) 
+sort(z)
 ```
 
 
@@ -207,6 +195,14 @@ Small Straight    .1235
 
 Chance            .6326
 -------------------------------------------------------
+```{r}
+answer<-matrix(,nrow=100000)
+for (i in 1:nrow(answer)){
+  answer[i,]=namer(sample(1:6,size=5,replace=T))
+}
+table(answer)/nrow(answer)
+
+```
 
 
 
